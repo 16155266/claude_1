@@ -131,6 +131,11 @@ ul {
   color: var(--accent-2);
 }
 
+.plain-email {
+  color: var(--accent-2);
+  font-weight: 600;
+}
+
 .form-card {
   margin-bottom: 24px;
 }
