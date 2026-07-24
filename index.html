@@ -663,6 +663,11 @@
           contactsTitle: 'Контакты',
           telegramLabel: 'Telegram:',
           emailLabel: 'Email:',
+          spamRejected: 'Заявка отклонена как спам.',
+          fillRequired: 'Пожалуйста, заполните все обязательные поля.',
+          sending: 'Отправка...',
+          submitSuccess: 'Заявка отправлена, ответим в течение 24 часов.',
+          submitError: 'Не удалось отправить заявку. Проверьте endpoint формы в конфиге и повторите попытку.',
           title: 'shoes.by — премиальный домен продаётся',
           description: 'shoes.by — премиальный домен для обувного бизнеса, интернет-магазина или бренда. Короткий, лаконичный и легко запоминающийся.',
           ogTitle: 'shoes.by — премиальный домен продаётся',
@@ -705,6 +710,11 @@
           contactsTitle: 'Contacts',
           telegramLabel: 'Telegram:',
           emailLabel: 'Email:',
+          spamRejected: 'Submission rejected as spam.',
+          fillRequired: 'Please fill in all required fields.',
+          sending: 'Sending...',
+          submitSuccess: 'Request sent, we will reply within 24 hours.',
+          submitError: 'Could not send the request. Check the form endpoint in the config and try again.',
           title: 'shoes.by — premium domain for sale',
           description: 'shoes.by — a premium domain for a footwear business, online store, or brand. Short, concise, and easy to remember.',
           ogTitle: 'shoes.by — premium domain for sale',
@@ -727,8 +737,11 @@
       const ogTitle = document.querySelector('meta[property="og:title"]');
       const ogDescription = document.querySelector('meta[property="og:description"]');
 
+      let currentLang = 'ru';
+
       function setLanguage(lang) {
         const t = translations[lang] || translations.ru;
+        currentLang = translations[lang] ? lang : 'ru';
         document.documentElement.lang = lang;
         i18nNodes.forEach((node) => {
           const key = node.dataset.i18n;
@@ -779,12 +792,13 @@
       });
 
       async function submitForm(formElement, statusElement) {
+        const t = translations[currentLang] || translations.ru;
         statusElement.className = 'status';
 
         const formData = new FormData(formElement);
         const honeypot = formData.get('website');
         if (honeypot) {
-          statusElement.textContent = 'Spam rejected.';
+          statusElement.textContent = t.spamRejected;
           return;
         }
 
@@ -794,12 +808,12 @@
 
         if (!name || !contact || !message) {
           statusElement.classList.add('error');
-          statusElement.textContent = 'Please fill in all required fields.';
+          statusElement.textContent = t.fillRequired;
           return;
         }
 
         formElement.querySelector('button[type="submit"]').disabled = true;
-        statusElement.textContent = 'Sending...';
+        statusElement.textContent = t.sending;
 
         try {
           const response = await fetch(FORM_ENDPOINT, {
@@ -816,11 +830,11 @@
 
           formElement.reset();
           statusElement.classList.add('success');
-          statusElement.textContent = 'Заявка отправлена, ответим в течение 24 часов.';
+          statusElement.textContent = t.submitSuccess;
           closeModal();
         } catch (error) {
           statusElement.classList.add('error');
-          statusElement.textContent = 'Не удалось отправить заявку. Проверьте endpoint формы в конфиге и повторите попытку.';
+          statusElement.textContent = t.submitError;
         } finally {
           formElement.querySelector('button[type="submit"]').disabled = false;
         }
