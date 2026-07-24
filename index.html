@@ -182,6 +182,46 @@
         margin-bottom: 24px;
       }
 
+      .modal {
+        position: fixed;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        background: rgba(0, 0, 0, 0.48);
+        z-index: 50;
+      }
+
+      .modal.is-open {
+        display: flex;
+      }
+
+      .modal-card {
+        width: min(100%, 560px);
+        padding: 22px;
+        border-radius: 24px;
+        background: var(--bg-2);
+        border: 1px solid var(--line);
+        box-shadow: var(--shadow);
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+
+      .modal-close {
+        border: 0;
+        background: transparent;
+        color: var(--muted);
+        font-size: 1.5rem;
+        cursor: pointer;
+      }
+
       .btn {
         display: inline-flex;
         align-items: center;
@@ -444,7 +484,7 @@
               </div>
 
               <div class="actions">
-                <a class="btn primary" href="#lead-form" data-i18n="ctaBuy">Купить домен</a>
+                <button class="btn primary" type="button" data-open-modal data-i18n="ctaBuy">Купить домен</button>
                 <a class="btn secondary" href="https://t.me/Lokalokaaa" target="_blank" rel="noreferrer" data-i18n="ctaQuestion">Задать вопрос</a>
               </div>
 
@@ -539,6 +579,39 @@
             <div class="status" id="formStatus" aria-live="polite"></div>
           </form>
         </section>
+
+        <div class="modal" id="leadModal" aria-hidden="true">
+          <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+            <div class="modal-header">
+              <h2 id="modalTitle" data-i18n="formTitle">Оставить заявку</h2>
+              <button class="modal-close" type="button" aria-label="Close">×</button>
+            </div>
+            <p class="form-note" data-i18n="formNote">
+              Домен может быть продан в любой момент. Укажите контакт, и мы вернёмся в течение 24 часов.
+            </p>
+            <form class="contact-form" id="modalForm" novalidate>
+              <input type="text" class="honeypot" name="website" tabindex="-1" autocomplete="off" />
+
+              <label>
+                <span data-i18n="labelName">Имя</span>
+                <input class="field" type="text" name="name" data-i18n-placeholder="placeholderName" placeholder="Ваше имя" required />
+              </label>
+
+              <label>
+                <span data-i18n="labelContact">Email или Telegram</span>
+                <input class="field" type="text" name="contact" data-i18n-placeholder="placeholderContact" placeholder="you@example.com или @username" required />
+              </label>
+
+              <label>
+                <span data-i18n="labelMessage">Сообщение</span>
+                <textarea class="field" name="message" rows="5" data-i18n-placeholder="placeholderMessage" placeholder="Напишите ваш запрос" required></textarea>
+              </label>
+
+              <button class="btn primary" type="submit" data-i18n="submit">Отправить заявку</button>
+              <div class="status" id="modalStatus" aria-live="polite"></div>
+            </form>
+          </div>
+        </div>
 
         <section class="card">
           <h2 data-i18n="contactsTitle">Контакты</h2>
@@ -648,7 +721,12 @@
       };
 
       const form = document.getElementById('contactForm');
+      const modalForm = document.getElementById('modalForm');
       const formStatus = document.getElementById('formStatus');
+      const modalStatus = document.getElementById('modalStatus');
+      const modal = document.getElementById('leadModal');
+      const modalClose = document.querySelector('.modal-close');
+      const openModalButtons = document.querySelectorAll('[data-open-modal]');
       const langButtons = document.querySelectorAll('.lang-btn');
       const i18nNodes = document.querySelectorAll('[data-i18n]');
       const i18nPlaceholders = document.querySelectorAll('[data-i18n-placeholder]');
@@ -679,18 +757,42 @@
         });
       }
 
+      function openModal() {
+        modal.classList.add('is-open');
+        modal.setAttribute('aria-hidden', 'false');
+      }
+
+      function closeModal() {
+        modal.classList.remove('is-open');
+        modal.setAttribute('aria-hidden', 'true');
+      }
+
+      openModalButtons.forEach((button) => {
+        button.addEventListener('click', openModal);
+      });
+
+      modalClose.addEventListener('click', closeModal);
+      modal.addEventListener('click', (event) => {
+        if (event.target === modal) closeModal();
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && modal.classList.contains('is-open')) {
+          closeModal();
+        }
+      });
+
       langButtons.forEach((btn) => {
         btn.addEventListener('click', () => setLanguage(btn.dataset.lang));
       });
 
-      form.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        formStatus.className = 'status';
+      async function submitForm(formElement, statusElement) {
+        statusElement.className = 'status';
 
-        const formData = new FormData(form);
+        const formData = new FormData(formElement);
         const honeypot = formData.get('website');
         if (honeypot) {
-          formStatus.textContent = 'Spam rejected.';
+          statusElement.textContent = 'Spam rejected.';
           return;
         }
 
@@ -699,13 +801,13 @@
         const message = String(formData.get('message') || '').trim();
 
         if (!name || !contact || !message) {
-          formStatus.classList.add('error');
-          formStatus.textContent = 'Please fill in all required fields.';
+          statusElement.classList.add('error');
+          statusElement.textContent = 'Please fill in all required fields.';
           return;
         }
 
-        form.querySelector('button[type="submit"]').disabled = true;
-        formStatus.textContent = 'Sending...';
+        formElement.querySelector('button[type="submit"]').disabled = true;
+        statusElement.textContent = 'Sending...';
 
         try {
           const response = await fetch(FORM_ENDPOINT, {
@@ -720,15 +822,26 @@
             throw new Error('Request failed');
           }
 
-          form.reset();
-          formStatus.classList.add('success');
-          formStatus.textContent = 'Заявка отправлена, ответим в течение 24 часов.';
+          formElement.reset();
+          statusElement.classList.add('success');
+          statusElement.textContent = 'Заявка отправлена, ответим в течение 24 часов.';
+          closeModal();
         } catch (error) {
-          formStatus.classList.add('error');
-          formStatus.textContent = 'Не удалось отправить заявку. Проверьте endpoint формы в конфиге и повторите попытку.';
+          statusElement.classList.add('error');
+          statusElement.textContent = 'Не удалось отправить заявку. Проверьте endpoint формы в конфиге и повторите попытку.';
         } finally {
-          form.querySelector('button[type="submit"]').disabled = false;
+          formElement.querySelector('button[type="submit"]').disabled = false;
         }
+      }
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        await submitForm(form, formStatus);
+      });
+
+      modalForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        await submitForm(modalForm, modalStatus);
       });
 
       setLanguage('ru');
