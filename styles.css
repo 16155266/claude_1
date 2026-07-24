@@ -1,11 +1,14 @@
 :root {
-  --bg: #0b1020;
-  --panel: #141b33;
-  --panel-2: #192444;
-  --text: #f6f7fb;
-  --muted: #aab3d1;
-  --accent: #79a7ff;
-  --accent-2: #b5d0ff;
+  --color-ink: #1d1d1f;
+  --color-graphite: #707070;
+  --color-slate: #474747;
+  --color-fog: #f5f5f7;
+  --color-snow: #ffffff;
+  --color-silver-mist: #e8e8ed;
+  --color-azure: #0071e3;
+  --color-cobalt-link: #0066cc;
+  --radius-card: 28px;
+  --radius-pill: 999px;
 }
 
 * {
@@ -14,72 +17,75 @@
 
 body {
   margin: 0;
-  font-family: Inter, Arial, sans-serif;
-  background:
-    radial-gradient(circle at top, #1b2952 0%, #0b1020 58%),
-    #0b1020;
-  color: var(--text);
+  font-family: "SF Pro Text", "SF Pro Display", Inter, system-ui, sans-serif;
+  background: var(--color-fog);
+  color: var(--color-ink);
 }
 
 .wrap {
-  max-width: 900px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 40px 20px 60px;
+  padding: 56px 20px 80px;
 }
 
 .hero {
-  padding: 42px 24px;
+  padding: 32px 12px 24px;
   text-align: center;
 }
 
 .eyebrow {
   text-transform: uppercase;
-  color: var(--accent-2);
+  color: var(--color-graphite);
   letter-spacing: 0.12em;
-  font-size: 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 600;
 }
 
 h1 {
-  font-size: clamp(2.5rem, 7vw, 4.5rem);
-  margin: 8px 0;
+  font-family: "SF Pro Display", Inter, system-ui, sans-serif;
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 700;
+  letter-spacing: -0.022em;
+  margin: 10px 0 14px;
+  line-height: 1.04;
 }
 
 .subtitle {
-  color: var(--muted);
-  font-size: 1.06rem;
-  max-width: 680px;
-  margin: 0 auto 24px;
+  color: var(--color-graphite);
+  font-size: 1.1rem;
+  line-height: 1.5;
+  max-width: 760px;
+  margin: 0 auto 30px;
 }
 
 .stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 14px;
-  margin: 28px 0;
+  margin: 28px 0 30px;
 }
 
 .stat,
 .card {
-  background: rgba(20, 27, 51, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 18px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
+  background: var(--color-snow);
+  border: 1px solid var(--color-silver-mist);
+  border-radius: var(--radius-card);
 }
 
 .stat {
-  padding: 20px;
+  padding: 22px 20px;
 }
 
 .value {
   display: block;
-  font-size: 1.4rem;
+  font-size: 1.35rem;
   font-weight: 700;
-  margin-bottom: 6px;
+  margin-bottom: 5px;
 }
 
 .label {
-  color: var(--muted);
-  font-size: 0.92rem;
+  color: var(--color-graphite);
+  font-size: 0.95rem;
 }
 
 .actions {
@@ -91,48 +97,58 @@ h1 {
 
 .btn {
   text-decoration: none;
-  color: var(--text);
+  color: var(--color-ink);
   padding: 12px 18px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   font-weight: 600;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .btn.primary {
-  background: var(--accent);
+  background: var(--color-azure);
+  color: #ffffff;
+}
+
+.btn.primary:hover {
+  background: #005ec6;
 }
 
 .btn.secondary {
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(29, 29, 31, 0.14);
 }
 
 .card {
-  padding: 24px;
+  padding: 28px;
   margin-top: 18px;
 }
 
 .card h2 {
   margin-top: 0;
+  font-family: "SF Pro Display", Inter, system-ui, sans-serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 ul {
-  padding-left: 18px;
-  color: var(--muted);
+  padding-left: 20px;
+  color: var(--color-slate);
+  line-height: 1.6;
 }
 
 .contact-row {
   margin-top: 12px;
   display: flex;
-  gap: 8px;
+  gap: 10px;
   flex-wrap: wrap;
+  align-items: center;
 }
 
-.contact-row a {
-  color: var(--accent-2);
-}
-
-.plain-email {
-  color: var(--accent-2);
+.contact-row a,
+.contact-row .plain-email {
+  color: var(--color-cobalt-link);
+  text-decoration: none;
   font-weight: 600;
 }
 
@@ -148,25 +164,35 @@ ul {
 .contact-form label {
   display: grid;
   gap: 8px;
-  color: var(--muted);
+  color: var(--color-slate);
 }
 
 .contact-form input,
 .contact-form textarea {
   width: 100%;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  border: 1px solid rgba(29, 29, 31, 0.12);
   padding: 12px 14px;
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--text);
+  background: var(--color-fog);
+  color: var(--color-ink);
   font: inherit;
 }
 
 .contact-form input::placeholder,
 .contact-form textarea::placeholder {
-  color: #8590b8;
+  color: var(--color-graphite);
 }
 
 .contact-form textarea {
   resize: vertical;
+}
+
+@media (max-width: 640px) {
+  .wrap {
+    padding: 24px 14px 60px;
+  }
+
+  .card {
+    padding: 22px;
+  }
 }
