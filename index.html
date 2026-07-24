@@ -622,7 +622,7 @@
     </div>
 
     <script>
-      const FORM_ENDPOINT = 'https://formsubmit.co/sale@shoes.by';
+      const FORM_ENDPOINT = 'https://formsubmit.co/ajax/sale@shoes.by';
       // заменить на свой endpoint формы, если используете другой сервис
 
       const translations = {
@@ -824,7 +824,9 @@
             }
           });
 
-          if (!response.ok) {
+          const result = await response.json().catch(() => null);
+
+          if (!response.ok || !result || result.success === 'false' || result.success === false) {
             throw new Error('Request failed');
           }
 
